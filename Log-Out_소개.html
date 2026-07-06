@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log-Out : 로그로 밝혀내는 직장 내 정의</title>
+<link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --bg:#eceef3; --bg2:#e3e6ec; --card:#ffffff; --ink:#1b1e26; --body:#515b6b; --dim:#8790a0;
+    --line:#dcdfe6; --line2:#cdd2dc;
+    --accent:#3b5bdb; --accent-soft:#e9edfc; --red:#dc4449; --red-soft:#fbe9e9; --green:#2f9e6f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif;background:var(--bg);color:var(--ink);
+    line-height:1.7;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+  .wrap{max-width:940px;margin:0 auto;padding:0 28px}
+  section{padding:96px 0;border-bottom:1px solid var(--line)}
+  .kicker{font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h2{font-size:clamp(26px,3.6vw,36px);font-weight:800;letter-spacing:-.03em;line-height:1.25;margin-bottom:16px;color:var(--ink)}
+  .lead{color:var(--body);font-size:clamp(15px,2vw,17px);max-width:680px}
+  strong{color:var(--ink);font-weight:700}
+  .accent{color:var(--accent)}
+
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* nav */
+  .topnav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .topnav .inner{max-width:940px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+  .topnav .brand{font-size:17px;font-weight:800;letter-spacing:-.02em}
+  .topnav .brand .o{color:var(--red)}
+  .topnav .tag{font-size:12px;color:var(--dim);font-weight:500}
+  .bar{position:fixed;top:0;left:0;height:2px;background:var(--accent);width:0;z-index:60}
+
+  /* hero */
+  .hero{padding:120px 28px 96px;text-align:center;border-bottom:1px solid var(--line)}
+  .hero .pill{display:inline-block;font-size:12.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);
+    padding:7px 16px;border-radius:100px;margin-bottom:28px}
+  .hero h1{font-size:clamp(56px,10vw,104px);font-weight:900;letter-spacing:-.05em;line-height:.95;margin-bottom:20px}
+  .hero h1 .o{color:var(--red)}
+  .hero .tag{font-size:clamp(17px,2.4vw,21px);font-weight:600;color:var(--ink);margin-bottom:16px;letter-spacing:-.02em}
+  .hero .sub{font-size:15px;color:var(--body);max-width:580px;margin:0 auto 34px;line-height:1.75}
+  .chips-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .hchip{font-size:13px;color:var(--body);background:var(--bg2);border:1px solid var(--line);padding:8px 16px;border-radius:8px}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:40px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+  .stat{padding:30px 20px;text-align:center;border-right:1px solid var(--line)}
+  .stat:last-child{border-right:none}
+  .stat .num{font-size:36px;font-weight:900;letter-spacing:-.03em;color:var(--ink)}
+  .stat .lbl{font-size:13px;color:var(--body);margin-top:8px;line-height:1.5}
+  .cite{font-size:10px;font-weight:700;color:var(--accent);vertical-align:super;margin-left:2px;text-decoration:none}
+  .cite:hover{text-decoration:underline}
+  .subnote{margin-top:20px;font-size:13.5px;color:var(--dim)}
+  .subnote strong{color:var(--red)}
+
+  /* pains */
+  .pains{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:40px}
+  .pain{padding:30px;border:1px solid var(--line);border-radius:14px;transition:.25s;background:var(--card)}
+  .pain:hover{border-color:var(--line2);box-shadow:0 10px 30px -18px rgba(17,19,24,.18)}
+  .pain .who{display:inline-block;font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;margin-bottom:16px}
+  .pain.p1 .who{background:var(--red-soft);color:var(--red)}
+  .pain.p2 .who{background:var(--accent-soft);color:var(--accent)}
+  .pain h3{font-size:19px;font-weight:800;margin-bottom:10px;letter-spacing:-.02em}
+  .pain p{font-size:14.5px;color:var(--body)}
+  .bridge{margin-top:28px;text-align:center;font-size:15.5px;color:var(--body)}
+  .bridge b{color:var(--ink)}
+
+  /* mockup */
+  .mock{margin-top:40px;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 30px 60px -35px rgba(17,19,24,.25);background:var(--card)}
+  .mockbar{display:flex;align-items:center;gap:7px;padding:14px 20px;border-bottom:1px solid var(--line);background:var(--bg2)}
+  .mockbar i{width:10px;height:10px;border-radius:50%;background:#d5d9e0}
+  .mockbar .url{margin-left:12px;font-size:12px;color:var(--dim);background:#fff;border:1px solid var(--line);padding:5px 14px;border-radius:7px}
+  .mockbody{display:grid;grid-template-columns:1fr 1.25fr;gap:22px;padding:28px}
+  .gauge-wrap{text-align:center;border:1px solid var(--red-soft);background:#fef7f7;border-radius:14px;padding:26px 20px}
+  .gauge{position:relative;width:170px;height:170px;margin:0 auto}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .pct{font-size:42px;font-weight:900;color:var(--red);line-height:1}
+  .gauge .pl{font-size:12px;color:var(--body);margin-top:4px}
+  .risk-tag{display:inline-block;margin-top:16px;font-size:12.5px;font-weight:700;color:var(--red);background:var(--red-soft);padding:7px 16px;border-radius:100px}
+  .metrics{display:flex;flex-direction:column;gap:15px;justify-content:center}
+  .metric .top{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:7px}
+  .metric .top b{color:var(--ink);font-weight:600}.metric .top span{color:var(--ink);font-weight:800}
+  .track{height:8px;background:#eef0f4;border-radius:100px;overflow:hidden}
+  .fill{height:100%;border-radius:100px;width:0;transition:width 1.3s cubic-bezier(.2,.8,.2,1)}
+  .f2{background:var(--red)}.f1{background:var(--accent)}
+  .evbox{grid-column:1/-1;border:1px solid var(--line);border-radius:12px;padding:20px 22px;background:var(--bg2)}
+  .evbox .h{font-size:12px;font-weight:800;letter-spacing:.03em;color:var(--dim);margin-bottom:12px}
+  .ev{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .ev:last-child{border:none}
+  .ev .hl{font-size:14px;color:#8a2a2d;background:var(--red-soft);padding:4px 9px;border-radius:6px;flex:1;line-height:1.6}
+  .ev .law{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:6px;white-space:nowrap;margin-top:2px}
+  .mockcap{text-align:center;font-size:12.5px;color:var(--dim);padding:0 0 24px}
+
+  /* flow */
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+  .step{padding:24px 20px;border:1px solid var(--line);border-radius:14px;transition:.25s;background:var(--card)}
+  .step:hover{border-color:var(--line2);box-shadow:0 10px 30px -18px rgba(17,19,24,.18)}
+  .step .n{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;margin-bottom:14px;background:var(--accent-soft);color:var(--accent)}
+  .step.gen .n{background:var(--red-soft);color:var(--red)}
+  .step h4{font-size:15px;font-weight:700;margin-bottom:6px}
+  .step p{font-size:13px;color:var(--body);line-height:1.55}
+  .note{margin-top:30px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:22px 26px;font-size:14.5px;color:var(--body);line-height:1.8;background:var(--bg2)}
+  .note b{color:var(--accent)}
+
+  /* tiers */
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+  .tier{padding:28px;border:1px solid var(--line);border-radius:14px;position:relative;transition:.25s;background:var(--card)}
+  .tier:hover{border-color:var(--line2);box-shadow:0 12px 34px -20px rgba(17,19,24,.2)}
+  .tier .tnum{font-size:12px;font-weight:800;letter-spacing:.05em;padding:4px 11px;border-radius:100px;display:inline-block;margin-bottom:14px}
+  .tier.t1 .tnum{background:#eaf6ef;color:var(--green)}
+  .tier.t2 .tnum{background:#fff3e6;color:#c77d20}
+  .tier.t3 .tnum{background:var(--accent-soft);color:var(--accent)}
+  .tier h4{font-size:18px;font-weight:800;margin-bottom:6px}
+  .tier .conf{font-size:12.5px;color:var(--dim);margin-bottom:12px}
+  .tier p{font-size:13.5px;color:var(--body);line-height:1.6}
+  .tier .ex{margin-top:13px;font-size:12.5px;color:var(--body);background:var(--bg2);border-left:2px solid var(--line2);padding:9px 12px;border-radius:0 8px 8px 0}
+  .tier .badge2{position:absolute;top:26px;right:24px;font-size:11px;font-weight:700;color:var(--dim)}
+
+  /* dual */
+  .dual{display:grid;grid-template-columns:1.05fr 1fr;gap:18px;margin-top:40px}
+  .board{border-radius:16px;padding:32px;transition:.25s}
+  .board.main{background:var(--ink);color:#fff;border:1px solid var(--ink)}
+  .board.sub{border:1px solid var(--line);background:var(--card)}
+  .board.sub:hover{border-color:var(--line2)}
+  .role{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.05em;margin-bottom:14px;padding:5px 12px;border-radius:100px}
+  .board.main .role{background:rgba(255,255,255,.14);color:#fff}
+  .board.sub .role{background:var(--accent-soft);color:var(--accent)}
+  .board h3{font-size:21px;font-weight:800;margin-bottom:18px;letter-spacing:-.02em}
+  .board.main h3{color:#fff}
+  .board ul{list-style:none}
+  .board li{font-size:14.5px;padding:9px 0 9px 26px;position:relative}
+  .board.main li{color:#d3d8e2}.board.sub li{color:var(--body)}
+  .board li:before{content:"";position:absolute;left:0;top:16px;width:12px;height:2px;border-radius:2px}
+  .board.main li:before{background:#6b83e8}.board.sub li:before{background:var(--accent)}
+  .tagline{display:inline-block;margin-top:18px;font-size:13.5px;font-weight:600;padding:10px 16px;border-radius:10px}
+  .board.main .tagline{background:rgba(255,255,255,.1);color:#fff}
+  .board.sub .tagline{background:var(--bg2);color:var(--body);border:1px solid var(--line)}
+
+  /* spectrum */
+  .spectrum{margin-top:40px;display:flex;flex-direction:column;gap:12px}
+  .case{display:grid;grid-template-columns:210px 1fr 62px;align-items:center;gap:20px;padding:18px 22px;border:1px solid var(--line);border-radius:12px;transition:.25s;background:var(--card)}
+  .case:hover{border-color:var(--line2)}
+  .case .name{font-size:15px;font-weight:700;color:var(--ink)}
+  .case .name small{display:block;font-size:12px;color:var(--dim);font-weight:500;margin-top:2px}
+  .case .track2{height:10px;background:#eef0f4;border-radius:100px;overflow:hidden}
+  .case .track2 i{display:block;height:100%;border-radius:100px;width:0;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+  .case .sc{font-size:21px;font-weight:900;text-align:right}
+  .r-hi i{background:var(--red)}.r-hi .sc{color:var(--red)}
+  .r-md i{background:#e0902b}.r-md .sc{color:#e0902b}
+  .r-lo i{background:var(--green)}.r-lo .sc{color:var(--green)}
+  .r-t3 i{background:var(--accent)}.r-t3 .sc{color:var(--accent)}
+  .spec-note{margin-top:22px;font-size:14px;color:var(--body);text-align:center}
+  .disclaimer{margin-top:30px;border:1px dashed var(--line2);border-radius:12px;padding:22px 26px;font-size:13.5px;color:var(--body);line-height:1.75;background:var(--bg2)}
+  .disclaimer .dtag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;color:#fff;background:var(--ink);padding:4px 10px;border-radius:6px;margin-right:10px;vertical-align:middle}
+
+  /* diff */
+  .diff{width:100%;border-collapse:separate;border-spacing:0;margin-top:40px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+  .diff th,.diff td{padding:18px 22px;text-align:left;font-size:14.5px;vertical-align:top;border-bottom:1px solid var(--line)}
+  .diff thead th{background:var(--bg2);font-size:13px;font-weight:700;color:var(--dim)}
+  .diff thead th:last-child{color:var(--accent)}
+  .diff td:first-child{font-weight:700;color:var(--ink);width:22%}
+  .diff .gpt{color:var(--dim)}
+  .diff .ours{color:var(--ink);background:var(--accent-soft)}
+  .diff .ours b{color:var(--accent)}
+  .diff tbody tr:last-child td{border-bottom:none}
+
+  /* trust */
+  .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+  .tcard{padding:28px;border:1px solid var(--line);border-radius:14px;transition:.25s;background:var(--card)}
+  .tcard:hover{border-color:var(--line2);box-shadow:0 12px 34px -20px rgba(17,19,24,.2)}
+  .tcard .ic{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:15px;background:var(--bg2);border:1px solid var(--line)}
+  .tcard b{display:block;font-size:16px;color:var(--ink);margin-bottom:7px}
+  .tcard p{font-size:13.5px;color:var(--body);line-height:1.6}
+  .abuse{margin-top:26px;border:1px solid var(--line);border-left:3px solid #e0902b;border-radius:0 12px 12px 0;padding:22px 26px;font-size:14px;color:var(--body);line-height:1.75;background:#fffaf3}
+  .abuse b{color:#c77d20}
+
+  /* tech */
+  .tech{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
+  .tchip{padding:13px 18px;font-size:14px;color:var(--body);border:1px solid var(--line);border-radius:10px;transition:.2s;background:var(--card)}
+  .tchip:hover{border-color:var(--accent);color:var(--ink)}
+  .tchip b{color:var(--accent);font-weight:700}
+  .closing{margin-top:32px;font-size:15.5px;color:var(--body);line-height:1.8;max-width:740px}
+
+  /* sources */
+  .sources h5{font-size:12px;letter-spacing:.08em;color:var(--dim);margin-bottom:14px}
+  .sources ol{margin:0;padding-left:20px;color:var(--body);font-size:13px;line-height:1.9}
+  .sources li{margin-bottom:7px}
+  .sources a{color:var(--accent);text-decoration:none}
+  .sources a:hover{text-decoration:underline}
+
+  .foot{padding:44px 28px;text-align:center;color:var(--dim);font-size:13px;line-height:1.9;border-top:1px solid var(--line)}
+  .foot .lg{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px}
+  .foot .lg .o{color:var(--red)}
+
+  @media(max-width:820px){
+    .stats,.pains,.flow,.dual,.trust,.tiers{grid-template-columns:1fr}
+    .stat{border-right:none;border-bottom:1px solid var(--line)}
+    .mockbody{grid-template-columns:1fr}
+    .case{grid-template-columns:120px 1fr 50px;gap:12px;padding:14px 16px}
+    .case .name small{display:none}
+    .topnav .tag{display:none}
+    .diff thead{display:none}
+    .diff td{display:block;border-bottom:none;padding:5px 22px}
+    .diff td:first-child{padding-top:18px;width:auto}
+    .diff tbody tr{display:block;border-bottom:1px solid var(--line)}
+    .diff .ours{background:transparent}
+  }
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+
+<div class="topnav">
+  <div class="inner">
+    <div class="brand">Log·<span class="o">Out</span></div>
+    <div class="tag">직장 내 괴롭힘 증거 정량화 · 수사 증강 코파일럿</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="pill">제8회 K-디지털 트레이닝 해커톤 · 고용노동부 지정과제</div>
+  <h1>Log·<span class="o">Out</span></h1>
+  <div class="tag">로그(Log)로 밝혀내는 직장 내 정의, 갑질 빌런 아웃(Out)</div>
+  <p class="sub">머신러닝 텍스트 마이닝과 노동법 RAG로 만드는 직장 내 괴롭힘 <strong>증거 정량화 · 수사 증강 코파일럿</strong></p>
+  <div class="chips-row">
+    <span class="hchip">카톡 로그 → 정량 분석</span>
+    <span class="hchip">판례 RAG 매칭</span>
+    <span class="hchip">증거보고서 자동생성</span>
+  </div>
+</header>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="wrap reveal">
+    <div class="kicker">The Problem</div>
+    <h2>괴롭힘은 늘어나는데, 입증은 여전히 개인의 몫</h2>
+    <p class="lead">금지법 시행 이후에도 갑질과 가스라이팅은 오히려 은밀해졌습니다. 문제의 핵심은 <strong>수만 줄의 비정형 대화를 법적 증거로 가공할 역량의 부재</strong>입니다.</p>
+    <div class="stats">
+      <div class="stat"><div class="num" data-to="12253">0</div><div class="lbl">2024년 연간 신고 건수<br>(하루 약 50건)<a href="#sources" class="cite">1</a></div></div>
+      <div class="stat"><div class="num" data-to="35.9" data-suf="%">0</div><div class="lbl">직장인 피해 경험률<br>(3명 중 1명)<a href="#sources" class="cite">2</a></div></div>
+      <div class="stat"><div class="num" data-to="15" data-suf="%">0</div><div class="lbl">실제 신고 비율<br>(입증 단계 좌절)<a href="#sources" class="cite">3</a></div></div>
+      <div class="stat"><div class="num" data-to="55.7" data-suf="%">0</div><div class="lbl">'참거나 모른 척'<br>대응<a href="#sources" class="cite">3</a></div></div>
+    </div>
+    <p class="subnote">자해·죽음까지 고민한 피해자 <strong>22.8%</strong> — 1년 새 15.7%에서 급증<a href="#sources" class="cite">3</a></p>
+  </div>
+</section>
+
+<!-- PAINS -->
+<section id="pain" style="background:var(--bg2)">
+  <div class="wrap reveal">
+    <div class="kicker">Two People, One Bottleneck</div>
+    <h2>피해자도, 감독관도 '데이터의 벽' 앞에서 지친다</h2>
+    <div class="pains">
+      <div class="pain p1">
+        <span class="who">피해 근로자</span>
+        <h3>"이게 괴롭힘이 맞나?"</h3>
+        <p>수만 줄의 카톡을 앞에 두고 확신하지 못한 채 증거 수집 단계에서 좌절합니다. 법률 지식도 시간도 없는 '나약한 개인'.</p>
+      </div>
+      <div class="pain p2">
+        <span class="who">근로감독관</span>
+        <h3>밤새 스크롤하는 수사</h3>
+        <p>밀려드는 사건 속 수만 줄짜리 대화 파일을 일일이 읽습니다. 2027년까지 감독 물량이 14만 건으로 급증하는 '물리적 한계를 지닌 인간'.<a href="#sources" class="cite">4</a></p>
+      </div>
+    </div>
+    <p class="bridge">→ Log-Out은 이 <b>두 병목을 하나의 파이프라인</b>으로 동시에 해소합니다.</p>
+  </div>
+</section>
+
+<!-- PREVIEW -->
+<section id="preview">
+  <div class="wrap reveal">
+    <div class="kicker">Preview</div>
+    <h2>업로드하면, 이렇게 보입니다</h2>
+    <p class="lead">카톡 .txt 하나로 위험도 스코어, 정량 지표, 법 조항이 매칭된 핵심 증거가 한 화면에.</p>
+    <div class="mock">
+      <div class="mockbar"><i></i><i></i><i></i><span class="url">log-out.app / report / case-0427</span></div>
+      <div class="mockbody">
+        <div class="gauge-wrap">
+          <div class="gauge">
+            <svg width="170" height="170" viewBox="0 0 170 170">
+              <circle cx="85" cy="85" r="72" fill="none" stroke="#f2d9da" stroke-width="13"/>
+              <circle id="gc" cx="85" cy="85" r="72" fill="none" stroke="#e5484d" stroke-width="13"
+                stroke-linecap="round" stroke-dasharray="452" stroke-dashoffset="452"/>
+            </svg>
+            <div class="center"><div class="pct" data-to="89" data-suf="%">0</div><div class="pl">괴롭힘 위험도</div></div>
+          </div>
+          <div class="risk-tag">● 고위험 · 즉시 검토 권고</div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="top"><b>발화 독점률 (가해자)</b><span>78%</span></div><div class="track"><div class="fill f2" data-w="78"></div></div></div>
+          <div class="metric"><div class="top"><b>업무시간 외 발송률</b><span>42%</span></div><div class="track"><div class="fill f2" data-w="42"></div></div></div>
+          <div class="metric"><div class="top"><b>독성 어휘 밀도</b><span>63%</span></div><div class="track"><div class="fill f2" data-w="63"></div></div></div>
+          <div class="metric"><div class="top"><b>반복 지시 시퀀스 탐지</b><span>17건</span></div><div class="track"><div class="fill f1" data-w="71"></div></div></div>
+        </div>
+        <div class="evbox">
+          <div class="h">◆ 법적 효력 높은 핵심 증거 · 조항 자동 매칭</div>
+          <div class="ev"><div class="hl">"이딴 식으로 할 거면 간호사 때려치워. 환자한테 민폐야"</div><div class="law">근로기준법 §76-2 ③</div></div>
+          <div class="ev"><div class="hl">"자기 전에 오늘 뭐 잘못했는지 다섯 개 적어서 보내" <span style="color:var(--dim)">(오후 11:33)</span></div><div class="law">업무 적정범위 초과 ②</div></div>
+          <div class="ev"><div class="hl">"다 너 잘되라고 하는 거야. 은혜를 몰라"</div><div class="law">정황 후보 · Tier 3</div></div>
+        </div>
+      </div>
+      <div class="mockcap">※ 시연용 목업 화면 — 실제 지표는 업로드된 대화에서 연산됩니다</div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section id="flow" style="background:var(--bg2)">
+  <div class="wrap reveal">
+    <div class="kicker">How It Works</div>
+    <h2>카톡 업로드 → 1분 만에 증거 보고서</h2>
+    <div class="flow">
+      <div class="step"><div class="n">1</div><h4>데이터 입력</h4><p>카톡 대화 .txt 업로드, 개인정보 자동 마스킹</p></div>
+      <div class="step"><div class="n">2</div><h4>정량 분석 ML</h4><p>발화 독점률 · 시간외 지시 주기성 · 독성 밀도</p></div>
+      <div class="step"><div class="n">3</div><h4>법리 매칭 RAG</h4><p>고용부 매뉴얼 · 판례 Vector DB 조회</p></div>
+      <div class="step gen"><div class="n">4</div><h4>생성 · 리포팅</h4><p>위험도 스코어링, 증거보고서 · 진정서</p></div>
+    </div>
+    <div class="note">
+      <b>핵심 설계</b> — 근로기준법 <strong>제76조의2의 3대 성립요건</strong>을 정량 지표로 매핑합니다.
+      ① 지위·관계의 우위 ← <strong>발화 독점률</strong> · ② 업무상 적정범위 초과 ← <strong>시간외 반복 지시</strong> · ③ 신체적·정신적 고통 ← <strong>독성 어휘 밀도</strong>. 단순 욕설 검출이 아니라 '법적 성립 요건'을 정밀 타격합니다.
+    </div>
+  </div>
+</section>
+
+<!-- TIERS -->
+<section id="tiers">
+  <div class="wrap reveal">
+    <div class="kicker">3-Tier Evidence</div>
+    <h2>확신의 정도를 등급으로 나눈다</h2>
+    <p class="lead">모든 증거를 같은 확실성으로 내밀지 않습니다. 명백한 건 단정하고, 교묘한 건 '후보'로 표시해 사람에게 넘깁니다 — 이 설계가 신뢰성의 핵심입니다.</p>
+    <div class="tiers">
+      <div class="tier t1">
+        <span class="badge2">반박 불가</span>
+        <span class="tnum">TIER 1</span><h4>확정 지표</h4>
+        <div class="conf">수학적 연산 · 100% 재현 가능</div>
+        <p>발화 독점률, 시간외 지시 주기성, 반복성. 타임스탬프와 발화자 통계만으로 계산되어 반박이 불가능합니다.</p>
+        <div class="ex">예 — "가해자 발화 78%, 자정 이후 지시 17건"</div>
+      </div>
+      <div class="tier t2">
+        <span class="tnum">TIER 2</span><h4>분류 지표</h4>
+        <div class="conf">모델 확률값 · 검증된 오픈소스</div>
+        <p>모욕·독성 어휘 밀도를 한국어 혐오표현 분류 모델로 정량화. 확률 수치와 함께 근거 문장을 제시합니다.</p>
+        <div class="ex">예 — "87% 확률의 모욕 표현으로 분류"</div>
+      </div>
+      <div class="tier t3">
+        <span class="badge2">사람 검토</span>
+        <span class="tnum">TIER 3</span><h4>정황 후보</h4>
+        <div class="conf">LLM 맥락 추론 · 최종 판단은 사람</div>
+        <p>욕설 없는 교묘한 가스라이팅·배제·수동공격을 맥락으로 추론해 <strong>플래그만</strong> 띄웁니다. 확정이 아닌 검토 후보로 제시.</p>
+        <div class="ex">예 — "'너무 예민한 거 아니냐' → 가스라이팅 정황"</div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:30px">
+      <b>왜 이 구조인가</b> — Tier 3가 틀려도 "AI는 후보만 추리고 판단은 사람이 한다"는 원칙과 정확히 맞물립니다. 교묘한 괴롭힘을 <strong>'못 잡는다'가 아니라 '참고용 정황으로 제시한다'</strong>로 포지셔닝하여, 한계를 책임 있는 설계로 전환합니다.
+    </div>
+  </div>
+</section>
+
+<!-- DUAL -->
+<section id="dual" style="background:var(--bg2)">
+  <div class="wrap reveal">
+    <div class="kicker">Two Dashboards</div>
+    <h2>하나의 코어, 두 개의 화면</h2>
+    <p class="lead">파서 · 정량지표 · RAG 코어를 공유하고, 그 위에 사용자별 뷰만 얹습니다. <strong>감독관 수사지원이 메인, 피해자 리포트가 서브.</strong></p>
+    <div class="dual">
+      <div class="board main">
+        <span class="role">◆ MAIN</span>
+        <h3>근로감독관 수사지원 대시보드</h3>
+        <ul>
+          <li>다건 사건을 위험도순 자동 정렬</li>
+          <li>법적 효력 높은 핵심 증거 문장 하이라이트</li>
+          <li>위반 조항 · 유사 판례 자동 매칭</li>
+          <li>정량 증거 보고서 출력 → 사건 선별</li>
+        </ul>
+        <span class="tagline">"수만 줄을 5분 만에 솎아내는 디지털 포렌식"</span>
+      </div>
+      <div class="board sub">
+        <span class="role">◇ SUB</span>
+        <h3>피해 근로자 리포트</h3>
+        <ul>
+          <li>내 괴롭힘 위험도 시각화 (예: 89%)</li>
+          <li>주말 · 야간 발송률 등 패턴 그래프</li>
+          <li>핵심 증거 문장 하이라이트</li>
+          <li>진정서 초안 PDF 다운로드</li>
+        </ul>
+        <span class="tagline">"개인을 노동 전문가 수준으로 레벨업"</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo">
+  <div class="wrap reveal">
+    <div class="kicker">Demo Cases</div>
+    <h2>위험도 스펙트럼을 전부 커버한다</h2>
+    <p class="lead">기능 검증용 카톡 4종으로 고위험부터 정상, 그리고 교묘한 정황까지 대비되게 시연합니다.</p>
+    <div class="spectrum">
+      <div class="case r-hi"><div class="name">간호사 태움<small>프리셉터 폭언·새벽 지시</small></div><div class="track2"><i data-w="92"></i></div><div class="sc" data-to="92" data-suf="%">0</div></div>
+      <div class="case r-hi"><div class="name">사무직 상사 폭언<small>성과 갈취·업계 매장 협박</small></div><div class="track2"><i data-w="88"></i></div><div class="sc" data-to="88" data-suf="%">0</div></div>
+      <div class="case r-t3"><div class="name">교묘한 괴롭힘<small>배제·가스라이팅 (Tier 3)</small></div><div class="track2"><i data-w="61"></i></div><div class="sc" data-to="61" data-suf="%">0</div></div>
+      <div class="case r-lo"><div class="name">정상 업무 (대조군)<small>배려 있는 팀장</small></div><div class="track2"><i data-w="9"></i></div><div class="sc" data-to="9" data-suf="%">0</div></div>
+    </div>
+    <p class="spec-note">→ 정상 대화가 <b style="color:var(--green)">낮은 위험도</b>로 나온다는 것이 곧 <b style="color:var(--ink)">악용 방지·객관성</b>의 증명입니다.</p>
+    <div class="disclaimer">
+      <span class="dtag">DEMO DATA</span>
+      위 4종 대화는 <strong>기능 검증을 위해 직접 작성한 합성 카톡</strong>이며 실제 인물·사건과 무관합니다. 앞선 통계 수치와도 별개로, 오직 파서·정량지표·등급 분류 파이프라인이 위험도 스펙트럼을 정확히 구분하는지 시연하기 위한 테스트셋입니다.
+    </div>
+  </div>
+</section>
+
+<!-- DIFF -->
+<section id="diff" style="background:var(--bg2)">
+  <div class="wrap reveal">
+    <div class="kicker">Why Not Just ChatGPT</div>
+    <h2>"그냥 GPT에 물어보면?"에 대한 답</h2>
+    <table class="diff">
+      <thead><tr><th>구분</th><th>범용 생성형 AI '딸깍'</th><th>Log-Out</th></tr></thead>
+      <tbody>
+        <tr><td>판단 근거</td><td class="gpt">대화 전체를 프롬프트에 넣고 "괴롭힘 맞지?" — AI의 주관·환각에 의존</td><td class="ours">발화 비대칭·시간외 빈도·독성 밀도를 <b>수학적으로 연산</b>한 객관 수치를 컨텍스트로 결합</td></tr>
+        <tr><td>법적 요건</td><td class="gpt">긴 대화의 시간 흐름·반복성을 정밀 추적하지 못함</td><td class="ours">타임라인 전처리로 <b>'위험 시퀀스 패턴'</b>(주기·반복)을 자체 ML로 탐지</td></tr>
+        <tr><td>신뢰성</td><td class="gpt">존재하지 않는 법 조항·판례를 지어냄 (행정에 치명적)</td><td class="ours">고용부 매뉴얼·판례만 적재한 <b>폐쇄형 RAG</b> — 검증된 출처 내에서만 매칭</td></tr>
+        <tr><td>개인정보</td><td class="gpt">클라우드로 대화 원문 전송</td><td class="ours">자동 마스킹 + <b>로컬 DB</b> (수사자료 외부 유출 없음)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section id="trust">
+  <div class="wrap reveal">
+    <div class="kicker">Guardrails</div>
+    <h2>사람이 판단한다. AI는 증거를 정량화할 뿐</h2>
+    <div class="trust">
+      <div class="tcard"><div class="ic">⚖️</div><b>최종 판단은 사람</b><p>진위 판별과 법적 결정은 근로감독관·노무사·변호사가 수행. 도구는 증거 정량화·선별 보조에 한정됩니다.</p></div>
+      <div class="tcard"><div class="ic">🛡️</div><b>환각 차단</b><p>범용 지식이 아닌 검증된 매뉴얼·판례 출처 범위 내에서만 조항을 매칭해 신뢰성을 확보합니다.</p></div>
+      <div class="tcard"><div class="ic">🔒</div><b>프라이버시</b><p>제3자 개인정보 자동 마스킹, 클라우드 미전송 로컬 처리로 유출 리스크를 최소화합니다.</p></div>
+    </div>
+    <div class="abuse">
+      <b>악용·조작 우려는?</b> 접수 진위는 본래 수사 단계에서 가려집니다. Log-Out은 판결 도구가 아니라 <strong>증거를 구조화해 감독관의 판단을 돕는 보조 도구</strong>입니다. 향후 이미지 OCR·메타데이터 포렌식으로 위·변조 1차 검증을 확장할 수 있으며, MVP는 발화 독점률·시간외 주기성처럼 <strong>반박 불가능한 정량 지표</strong>를 전면에 세웁니다.
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section id="tech" style="background:var(--bg2)">
+  <div class="wrap reveal">
+    <div class="kicker">Tech Stack</div>
+    <h2>검증된 오픈소스로 해커톤 기간 내 서빙</h2>
+    <div class="tech">
+      <span class="tchip">UI · <b>Streamlit</b></span>
+      <span class="tchip">전처리 · <b>Python · Pandas · Regex</b></span>
+      <span class="tchip">형태소 · <b>KoNLPy</b></span>
+      <span class="tchip">독성 분류 · <b>KcELECTRA · BEEP! · K-MHaS</b></span>
+      <span class="tchip">RAG · <b>FAISS · LangChain</b></span>
+      <span class="tchip">생성 · <b>Claude / GPT API</b></span>
+    </div>
+    <p class="closing">입력값은 누구나 1초에 추출하는 카톡 .txt. 모델은 학습 없이 추론만, 판례는 로컬 임베딩. 완성 시 심사위원이 <strong>QR / URL로 직접 접속·체험</strong>할 수 있는 웹 데모(MVP)를 목표로 합니다.</p>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<section id="sources">
+  <div class="wrap reveal sources">
+    <h5>◆ 통계 출처 (Sources)</h5>
+    <ol>
+      <li>고용노동부 직장 내 괴롭힘 신고사건 처리 현황 — 2024년 12,253건, 업무일 기준 하루 약 49.8건. <a href="https://www.hankyung.com/article/202502041515i" target="_blank">한국경제, 「지난해 직장내 괴롭힘 신고 역대 최다…하루 50건꼴」 (2025.02.04)</a></li>
+      <li>직장갑질119 설문조사 — 최근 1년 직장 내 괴롭힘 경험률 35.9% (전년 동기 30.5%). <a href="https://www.fnnews.com/news/202502091505532854" target="_blank">파이낸셜뉴스 (2025.02.09)</a></li>
+      <li>직장갑질119 설문조사 — 신고 비율 약 15%, '참거나 모른 척' 55.7%, 자해·죽음 고민 22.8%(전년 15.7%). <a href="https://www.khan.co.kr/article/202507141114001" target="_blank">경향신문, 「피해자 절반은 그냥 참았다…신고 비율 15%뿐」 (2025.07.14)</a></li>
+      <li>근로감독 확대 계획(2024년 5.4만 건 → 2027년 14만 건) 및 사업주 가해 사건 비중 관련 — 고용노동부 「2026년 주요업무 추진계획」·직장 내 괴롭힘 사건 처리지침 개정(2026).</li>
+    </ol>
+    <p style="margin-top:14px;font-size:12px;color:var(--dim)">※ 수치는 조사 시점·기관에 따라 차이가 있을 수 있으며, 위 출처는 확인 가능한 최신 보도·공표 자료 기준입니다.</p>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="lg">Log·<span class="o">Out</span></div>
+  제8회 K-디지털 트레이닝 해커톤 · 아이디어 개발<br>
+  ※ 생성되는 진정서·고발장은 법적 대응을 돕는 '초안'이며, 최종 제출 전 전문가 검토를 권고합니다.
+</footer>
+
+<script>
+  const bar=document.getElementById('bar');
+  addEventListener('scroll',()=>{const h=document.documentElement;bar.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%'});
+  const animate=(el)=>{
+    el.querySelectorAll('[data-to]').forEach(n=>{
+      const to=parseFloat(n.dataset.to),suf=n.dataset.suf||'',dec=(n.dataset.to.indexOf('.')>-1)?1:0;
+      const isBig=to>1000;let s=null,dur=1300;
+      const tick=(t)=>{if(!s)s=t;let p=Math.min((t-s)/dur,1);p=1-Math.pow(1-p,3);
+        let v=(to*p);n.textContent=(isBig?Math.floor(v).toLocaleString():v.toFixed(dec))+suf;
+        if(p<1)requestAnimationFrame(tick)};requestAnimationFrame(tick);
+    });
+    el.querySelectorAll('.fill[data-w],.track2 i[data-w]').forEach(b=>{b.style.width=b.dataset.w+'%'});
+    const gc=el.querySelector('#gc');if(gc){gc.style.transition='stroke-dashoffset 1.5s cubic-bezier(.2,.8,.2,1)';gc.style.strokeDashoffset=452*(1-0.89)}
+  };
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');animate(e.target);io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
